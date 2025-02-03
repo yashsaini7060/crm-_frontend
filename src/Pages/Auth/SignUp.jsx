@@ -66,7 +66,7 @@ function SignUp() {
           <CardTitle>Create Account</CardTitle>
           <CardDescription>
             Create a new account or{" "}
-            <Link to="/signin" className="text-blue-500 hover:underline">
+            <Link to="/" className="text-blue-500 hover:underline">
               sign in to existing one
             </Link>
             .

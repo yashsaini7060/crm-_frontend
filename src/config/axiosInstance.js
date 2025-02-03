@@ -2,7 +2,9 @@ import axios from "axios";
 
 // Retrieve the token from local storage
 const token = localStorage.getItem('token');
-const BASE_URL = "http://localhost:3000/api/";
+// const BASE_URL = "http://localhost:3000/api/";
+const BASE_URL = "http://crmbackend-production-cf0e.up.railway.app/api/";
+
 const axiosInstance = axios.create();
 
 axiosInstance.defaults.baseURL = BASE_URL;
