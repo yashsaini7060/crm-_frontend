@@ -341,12 +341,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
+  const data = JSON.parse(localStorage.getItem("data"));
+  const name = data?.user?.name;
+
   useEffect(() => {
     const fetchClients = async () => {
       try {
         setLoading(true);
         const response = await dispatch(getAllClients()).unwrap();
-        console.log(response);
         setClientList(response);
         setError(null);
       } catch (error) {
@@ -574,7 +576,7 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold">
-              CRM Dashboard
+              {`Hello ${name}, Welcome to CRM`}
             </CardTitle>
           </CardHeader>
 
@@ -696,6 +698,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
+
           <CardContent>
             <Card className="mb-6">
               <CardContent className="p-2 sm:p-4">

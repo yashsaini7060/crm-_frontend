@@ -11,8 +11,9 @@ import BulkClientUpload from "./Pages/Client/BulkClientUpload";
 import LeadTransfer from "./Pages/Client/LeadTransfer";
 import Reports from "./Pages/Reports/page";
 import Quotation from "./Pages/Client/Quotation";
-// import AddSalesPerson from "./Pages/Client/AddSalesPerson";
 import Logout from "./Pages/Auth/Logout";
+import UsersTable from "./Pages/Admin/UsersTable";
+import UpdateUser from "./Pages/Admin/UpdateUser";
 function App() {
   return (
     <>
@@ -34,9 +35,9 @@ function App() {
           <Route path="/client/update-status/:id" element={<UpdateStatus />} />
           <Route path="/quotation/:id" element={<Quotation />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/users-table" element={<UsersTable />} />
+          <Route path="/update-user/:id" element={<UpdateUser />} />
         </Route>
-        {/* <Route path="/" element={<Dashboard />} /> */}
-
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

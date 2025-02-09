@@ -9,6 +9,14 @@ import HomeLayout from "@/Layout/HomeLayout";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateClient } from "@/redux/slices/clientSlice";
+import { toast } from "react-hot-toast";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { format } from "date-fns";
 
 const breadcrumbs = [
   { text: "Dashboard", href: "/dashboard" },
@@ -53,10 +61,15 @@ export default function ViewDetails() {
     }));
   };
 
-  const handleSave = () => {
-    console.log(editedDetails); // Check what data is being saved
-    dispatch(updateClient(editedDetails));
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      console.log(editedDetails);
+      await dispatch(updateClient(editedDetails)).unwrap();
+      setIsEditing(false);
+      toast.success("Client details updated successfully");
+    } catch (error) {
+      toast.error(error.message || "Failed to update client details");
+    }
   };
 
   const handleCancel = () => {
@@ -66,7 +79,7 @@ export default function ViewDetails() {
 
   return (
     <HomeLayout breadcrumbs={breadcrumbs}>
-      <Card className="max-w-3xl mx-auto p-4 sm:p-6">
+      <Card className="w-[95%] md:w-[60%] lg:w-[40%] mx-auto p-4 sm:p-6">
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -262,15 +275,15 @@ export default function ViewDetails() {
                     <Badge
                       variant="secondary"
                       className={`${
-                        editedDetails?.leadType === "Hot Lead"
+                        editedDetails?.leadType === "Hot"
                           ? "bg-red-100 text-red-800"
                           : ""
                       } ${
-                        editedDetails?.leadType === "Warm Lead"
+                        editedDetails?.leadType === "Warm"
                           ? "bg-yellow-100 text-yellow-800"
                           : ""
                       } ${
-                        editedDetails?.leadType === "Cold Lead"
+                        editedDetails?.leadType === "Cold"
                           ? "bg-blue-100 text-blue-800"
                           : ""
                       } text-base px-3 py-1 font-medium`}
@@ -291,7 +304,17 @@ export default function ViewDetails() {
                       Next Follow Up
                     </p>
                     <p className="text-lg">
-                      {editedDetails?.nextFollowUpDate || "N/A"}
+                      {editedDetails?.nextFollowUpDate
+                        ? new Date(
+                            editedDetails.nextFollowUpDate
+                          ).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "N/A"}
                     </p>
                   </div>
                 </div>
@@ -341,24 +364,87 @@ export default function ViewDetails() {
                 </div>
 
                 <div className="space-y-4">
-                  {editedDetails?.followUps?.map((followup) => (
-                    <div
-                      key={followup?.id}
-                      className="bg-gray-50 rounded-lg border p-3"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm font-medium text-gray-900">
-                          {editedDetails?.salesPerson?.name || "N/A"}
-                        </span>
-                        <Badge variant="outline" className="text-xs">
-                          {followup?.createdAt || "N/A"}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {followup?.remarks || "No remarks"}
-                      </p>
-                    </div>
-                  ))}
+                  <Accordion type="single" collapsible className="w-full">
+                    {editedDetails?.followUps?.map((followup, index) => (
+                      <AccordionItem key={followup._id} value={`item-${index}`}>
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex justify-between items-center w-full pr-4">
+                            <div className="flex items-center gap-3">
+                              <Badge
+                                variant="outline"
+                                className="text-sm px-3 py-1"
+                              >
+                                {format(new Date(followup.date), "dd MMM yyyy")}
+                              </Badge>
+                              <span className="text-base font-medium">
+                                {followup.followUpType}
+                              </span>
+                            </div>
+                            <Badge
+                              variant="secondary"
+                              className={`text-sm px-3 py-1 ${
+                                followup.status === "Pending"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-green-100 text-green-800"
+                              }`}
+                            >
+                              {followup.status}
+                            </Badge>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-4 p-6 bg-gray-50 rounded-lg">
+                            <div className="grid grid-cols-2 gap-6">
+                              <div>
+                                <p className="text-base font-medium text-gray-500 mb-2">
+                                  Time
+                                </p>
+                                <p className="text-base">{followup.time}</p>
+                              </div>
+                              <div>
+                                <p className="text-base font-medium text-gray-500 mb-2">
+                                  Type
+                                </p>
+                                <p className="text-base capitalize">
+                                  {followup.followUpType}
+                                </p>
+                              </div>
+                              <div className="col-span-2">
+                                <p className="text-base font-medium text-gray-500 mb-2">
+                                  Remarks
+                                </p>
+                                <p className="text-base leading-relaxed">
+                                  {followup.remarks}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-base font-medium text-gray-500 mb-2">
+                                  Created At
+                                </p>
+                                <p className="text-base">
+                                  {format(
+                                    new Date(followup.createdAt),
+                                    "dd MMM yyyy HH:mm"
+                                  )}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-base font-medium text-gray-500 mb-2">
+                                  Updated At
+                                </p>
+                                <p className="text-base">
+                                  {format(
+                                    new Date(followup.updatedAt),
+                                    "dd MMM yyyy HH:mm"
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
               </div>
             </CardContent>

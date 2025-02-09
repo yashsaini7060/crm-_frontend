@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router";
@@ -23,6 +23,14 @@ function SignIn() {
   const navigate = useNavigate();
   const [signInData, setSignInData] = useState({ email: "", password: "" });
 
+  // Check if the user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token && token !== "undefined") {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
   function handleInputChange(e) {
     const { name, value } = e.target;
     console.log(name, value);
@@ -39,15 +47,33 @@ function SignIn() {
       });
       return;
     }
-    // Handle sign-in logic here
-    // console.log(signInData);
-    const response = await dispatch(login(signInData));
-    if (response?.payload?.data) {
-      navigate("/dashboard");
-      setSignInData({
-        email: "",
-        password: "",
-      });
+
+    try {
+      const response = await dispatch(login(signInData));
+      if (response?.payload?.data) {
+        // Ensure token is properly stored in localStorage
+        console.log(response);
+        const token =
+          response.payload.data.token || response.payload.data.accessToken;
+        if (token) {
+          localStorage.setItem("token", token);
+          console.log(token);
+          // You might also want to store other user data
+          // localStorage.setItem(
+          //   "user",
+          //   JSON.stringify(response.payload.data.user)
+          // );
+        }
+
+        navigate("/dashboard");
+        setSignInData({
+          email: "",
+          password: "",
+        });
+      }
+    } catch (error) {
+      toast.error("Login failed. Please try again.");
+      console.error("Login error:", error);
     }
   }
 

@@ -1,9 +1,15 @@
-import { Frame, SquareTerminal, LogOut, UserPlus } from "lucide-react";
+import {
+  Frame,
+  SquareTerminal,
+  LogOut,
+  UserPlus,
+  File,
+  User,
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
+// import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
-import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+// import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -19,23 +25,7 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  // teams: [
-  //   {
-  //     name: "Acme Inc",
-  //     logo: GalleryVerticalEnd,
-  //     plan: "Enterprise",
-  //   },
-  //   {
-  //     name: "Acme Corp.",
-  //     logo: AudioWaveform,
-  //     plan: "Startup",
-  //   },
-  //   {
-  //     name: "Evil Corp.",
-  //     logo: Command,
-  //     plan: "Free",
-  //   },
-  // ],
+
   navMain: [
     {
       title: "Reports",
@@ -70,6 +60,16 @@ const data = {
       icon: UserPlus,
     },
     {
+      name: "Reports",
+      url: "/reports",
+      icon: File,
+    },
+    {
+      name: "Users",
+      url: "/users-table",
+      icon: User,
+    },
+    {
       name: "Logout",
       url: "/logout",
       icon: LogOut,
@@ -85,7 +85,7 @@ export function AppSidebar({ ...props }) {
       </SidebarHeader> */}
       <SidebarContent>
         <NavProjects projects={data.projects} />
-        <NavMain items={data.navMain} />
+        {/* <NavMain items={data.navMain} /> */}
       </SidebarContent>
       <SidebarFooter>{/* <NavUser user={data.user} /> */}</SidebarFooter>
       <SidebarRail />

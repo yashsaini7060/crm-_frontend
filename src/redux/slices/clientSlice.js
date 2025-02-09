@@ -4,7 +4,8 @@ import { toast } from "react-hot-toast";
 import axiosInstance from "../../config/axiosInstance";
 
 const initialState = {
-  clientData: JSON.parse(localStorage.getItem('clientData')) || []
+  clientData: JSON.parse(localStorage.getItem('clientData')) || [],
+  selectedClient: null,
 }
 
 export const getAllClients = createAsyncThunk("/client/get", async () => {
@@ -108,6 +109,39 @@ export const closeLead = createAsyncThunk("/lead/close", async (data) => {
   }
 });
 
+export const transferLead = createAsyncThunk(
+  'client/transferLead',
+  async ({ clientId, toSalesPerson, reason }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/lead/transfer', {
+        clientId,
+        toSalesPerson,
+        reason
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const getClientDetails = createAsyncThunk("/client/details", async (id) => {
+  try {
+    const response = axiosInstance.get(`/clients/${id}`);
+    toast.promise(response, {
+      loading: "Loading client details...",
+      success: "Client details loaded successfully",
+      error: "Failed to load client details",
+    });
+
+    const data = (await response).data?.data;
+    return data;
+  } catch (error) {
+    toast.error(error?.response?.data?.message);
+    throw error;
+  }
+});
+
 const clientSlice = createSlice({
   name: "clients",
   initialState,
@@ -151,6 +185,23 @@ const clientSlice = createSlice({
             client._id === action.payload._id ? { ...client, status: 'closed' } : client
           );
         }
+      })
+      .addCase(transferLead.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.clientData = state.clientData.map(client =>
+            client._id === action.payload.client
+              ? { ...client, salesPerson: action.payload.toSalesPerson }
+              : client
+          );
+        }
+      })
+      .addCase(getClientDetails.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.selectedClient = action.payload;
+        }
+      })
+      .addCase(getClientDetails.rejected, (state) => {
+        state.selectedClient = null;
       });
   }
 });

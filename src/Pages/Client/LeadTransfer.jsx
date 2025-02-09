@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
 import HomeLayout from "@/Layout/HomeLayout";
 import {
@@ -24,6 +24,10 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { useDispatch, useSelector } from "react-redux";
+import { getClientDetails, transferLead } from "@/redux/slices/clientSlice";
+import { toast } from "react-hot-toast";
+import { fetchSalesPersons } from "@/redux/slices/dropDownSlice";
 
 const breadcrumbs = [
   { text: "Dashboard", href: "/dashboard" },
@@ -31,17 +35,24 @@ const breadcrumbs = [
 ];
 
 const formSchema = z.object({
-  clientName: z.string(),
-  currentSalesPerson: z.string().min(1, "Current sales person is required"),
-  newSalesPerson: z.string().min(1, "New sales person is required"),
-  reason: z.string().min(10, "Reason must be at least 10 characters"),
+  clientName: z.string().optional(),
+  currentSalesPerson: z.string().optional(),
+  newSalesPerson: z.string({
+    required_error: "Please select a new sales person",
+  }),
+  reason: z
+    .string()
+    .min(10, "Reason must be at least 10 characters")
+    .max(500, "Reason must not exceed 500 characters"),
 });
 
 export default function LeadTransfer() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-
+  const { selectedClient, isError } = useSelector((state) => state.client);
+  const { salesPersons, error } = useSelector((state) => state.dropdown);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,26 +62,31 @@ export default function LeadTransfer() {
       reason: "",
     },
   });
+  useEffect(() => {
+    dispatch(fetchSalesPersons());
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchLeadData = async () => {
       try {
-        // Mock data instead of API call
-        const mockData = {
-          clientName: "John Smith",
-          salesPersonId: "alice",
-        };
+        setIsLoading(true);
+        const response = await dispatch(getClientDetails(id)).unwrap();
 
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        if (response?.data) {
+          form.reset({
+            clientName: response.data.name,
+            currentSalesPerson: response.data.salesPerson?._id || "",
+            newSalesPerson: "",
+            reason: "",
+          });
+        }
 
-        form.reset({
-          clientName: mockData.clientName,
-          currentSalesPerson: mockData.salesPersonId,
-          newSalesPerson: "",
-          reason: "",
-        });
+        if (isError) {
+          throw new Error("Failed to fetch client details");
+        }
       } catch (error) {
         console.error("Error fetching lead:", error);
+        toast.error("Failed to fetch client details");
         navigate("/dashboard");
       } finally {
         setIsLoading(false);
@@ -80,26 +96,34 @@ export default function LeadTransfer() {
     if (id) {
       fetchLeadData();
     }
-  }, [id, navigate, form]);
+  }, [id]);
 
   const onSubmit = async (data) => {
     try {
-      // Mock successful submission
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log("Submitted data:", data);
+      setIsLoading(true);
+      await dispatch(
+        transferLead({
+          clientId: id,
+          toSalesPerson: data.newSalesPerson,
+          reason: data.reason,
+        })
+      ).unwrap();
+
+      toast.success("Lead transferred successfully");
       navigate("/dashboard");
     } catch (error) {
       console.error("Error transferring lead:", error);
+      toast.error(error.error || "Failed to transfer lead");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   if (isLoading) {
     return (
       <HomeLayout breadcrumbs={breadcrumbs}>
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-center h-[400px]">
-            <div className="text-lg">Loading...</div>
-          </div>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </HomeLayout>
     );
@@ -135,7 +159,11 @@ export default function LeadTransfer() {
                     <FormItem>
                       <FormLabel>Client Name</FormLabel>
                       <FormControl>
-                        <Input {...field} readOnly />
+                        <Input
+                          {...field}
+                          value={selectedClient?.name || ""}
+                          readOnly
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -148,21 +176,13 @@ export default function LeadTransfer() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Current Sales Person</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select current sales person" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="alice">Alice Johnson</SelectItem>
-                          <SelectItem value="bob">Bob Wilson</SelectItem>
-                          <SelectItem value="carol">Carol Martinez</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={selectedClient?.salesPerson?.name || ""}
+                          readOnly
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -184,9 +204,23 @@ export default function LeadTransfer() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="david">David Thompson</SelectItem>
-                          <SelectItem value="emma">Emma Rodriguez</SelectItem>
-                          <SelectItem value="frank">Frank Chen</SelectItem>
+                          {error ? (
+                            <SelectItem value="" disabled>
+                              Error loading sales persons
+                            </SelectItem>
+                          ) : (
+                            salesPersons
+                              ?.filter(
+                                (person) =>
+                                  person._id !==
+                                  selectedClient?.salesPerson?._id
+                              )
+                              .map((person) => (
+                                <SelectItem key={person._id} value={person._id}>
+                                  {person.name}
+                                </SelectItem>
+                              ))
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />

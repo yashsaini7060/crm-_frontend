@@ -52,6 +52,10 @@ export default function UpdateStatus() {
       closingNotes: "",
       tabs: "schedule",
     },
+    rules: {
+      date: { required: true },
+      time: { required: true },
+    },
   });
 
   const onSubmit = (data) => {
@@ -257,9 +261,12 @@ export default function UpdateStatus() {
                     <FormField
                       control={form.control}
                       name="date"
+                      rules={{ required: "Date is required" }}
                       render={({ field }) => (
                         <FormItem className="">
-                          <FormLabel>Date</FormLabel>
+                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                            Date
+                          </FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -302,15 +309,19 @@ export default function UpdateStatus() {
                     <FormField
                       control={form.control}
                       name="time"
+                      rules={{ required: "Time is required" }}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Time</FormLabel>
+                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                            Time
+                          </FormLabel>
                           <FormControl>
                             <div className="flex">
                               <Input
                                 type="time"
                                 {...field}
                                 className="w-full border-none justify-center"
+                                required
                               />
                               {/* <Button
                                 variant="outline"

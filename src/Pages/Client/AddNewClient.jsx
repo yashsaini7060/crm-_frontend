@@ -70,6 +70,7 @@ export default function AddNewClient() {
       potentialValue: "",
       shippingAddress: "",
       deliveryAddress: "",
+      parent: "",
     },
   });
 
@@ -211,32 +212,47 @@ export default function AddNewClient() {
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="queryType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Query Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="queryType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Query Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select query type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {queryTypes.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="parent"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Parent</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select query type" />
-                        </SelectTrigger>
+                        <Input {...field} placeholder="Enter parent name" />
                       </FormControl>
-                      <SelectContent>
-                        {queryTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -365,7 +381,14 @@ export default function AddNewClient() {
                 )}
               />
 
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Cancel
+                </Button>
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? "Adding..." : "Add New Client"}
                 </Button>
