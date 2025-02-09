@@ -167,27 +167,27 @@ export default function UpdateStatus() {
                           className="flex gap-4"
                         >
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="hot" id="hot" />
+                            <RadioGroupItem value="Hot" id="hot" />
                             <label
-                              htmlFor="hot"
+                              htmlFor="Hot"
                               className="rounded-full px-3 py-1 bg-red-100 text-red-700 text-sm"
                             >
                               Hot
                             </label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="warm" id="warm" />
+                            <RadioGroupItem value="Warm" id="warm" />
                             <label
-                              htmlFor="warm"
+                              htmlFor="Warm"
                               className="rounded-full px-3 py-1 bg-yellow-100 text-yellow-700 text-sm"
                             >
                               Warm
                             </label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="cold" id="cold" />
+                            <RadioGroupItem value="Cold" id="cold" />
                             <label
-                              htmlFor="cold"
+                              htmlFor="Cold"
                               className="rounded-full px-3 py-1 bg-blue-100 text-blue-700 text-sm"
                             >
                               Cold

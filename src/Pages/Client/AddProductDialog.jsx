@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
+import PropTypes from "prop-types";
 
 export default function AddProductDialog({ open, onOpenChange, onAddProduct }) {
   const {
@@ -40,29 +41,19 @@ export default function AddProductDialog({ open, onOpenChange, onAddProduct }) {
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-2 py-1">
           <div className="grid gap-2">
             <Label htmlFor="productName">Product Name</Label>
-            <Select onValueChange={(value) => setValue("productName", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Choose product" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="product 1">Product 1</SelectItem>
-                <SelectItem value="product 2">Product 2</SelectItem>
-                <SelectItem value="product 3">Product 3</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input
+              id="productName"
+              placeholder="Enter Product Name"
+              {...register("productName", { required: true })}
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="size">Size</Label>
-            <Select onValueChange={(value) => setValue("size", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select size" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="24x24">24x24</SelectItem>
-                <SelectItem value="30x30">30x30</SelectItem>
-                <SelectItem value="60x60">60x60</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input
+              id="size"
+              placeholder="Enter Size (e.g. 24x24)"
+              {...register("size", { required: true })}
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="hsnNo">HSN No</Label>
@@ -117,3 +108,9 @@ export default function AddProductDialog({ open, onOpenChange, onAddProduct }) {
     </Dialog>
   );
 }
+
+AddProductDialog.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onOpenChange: PropTypes.func.isRequired,
+  onAddProduct: PropTypes.func.isRequired,
+};

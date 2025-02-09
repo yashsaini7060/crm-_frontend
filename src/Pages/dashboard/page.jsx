@@ -344,6 +344,8 @@ export default function Dashboard() {
   const data = JSON.parse(localStorage.getItem("data"));
   const name = data?.user?.name;
 
+  const role = data?.user?.role;
+  console.log(role);
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -932,7 +934,7 @@ export default function Dashboard() {
                                     ? "bg-red-100 text-red-800"
                                     : item.leadType === "Warm"
                                     ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-green-100 text-green-800"
+                                    : "bg-blue-100 text-blue-800"
                                 }`}
                               >
                                 {item.leadType || "Cold"}
@@ -994,14 +996,18 @@ export default function Dashboard() {
                                     Update Status
                                   </DropdownMenuItem>
 
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      navigate(`/lead-transfer/${item.id}`)
-                                    }
-                                  >
-                                    <UserMinus className="h-4 w-4 mr-2" />
-                                    Lead Transfer
-                                  </DropdownMenuItem>
+                                  {(role === "superadmin" ||
+                                    role === "admin") && (
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        navigate(`/lead-transfer/${item.id}`)
+                                      }
+                                    >
+                                      <UserMinus className="h-4 w-4 mr-2" />
+                                      Lead Transfer
+                                    </DropdownMenuItem>
+                                  )}
+
                                   <DropdownMenuItem
                                     onClick={() =>
                                       navigate(`/quotation/${item.id}`)
@@ -1011,13 +1017,18 @@ export default function Dashboard() {
                                     Quotations
                                   </DropdownMenuItem>
 
-                                  <DropdownMenuItem
-                                    className="text-red-600"
-                                    onClick={() => handleDeleteClient(item._id)}
-                                  >
-                                    <Trash className="h-4 w-4 mr-2" />
-                                    Delete
-                                  </DropdownMenuItem>
+                                  {(role === "superadmin" ||
+                                    role === "admin") && (
+                                    <DropdownMenuItem
+                                      className="text-red-600"
+                                      onClick={() =>
+                                        handleDeleteClient(item._id)
+                                      }
+                                    >
+                                      <Trash className="h-4 w-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>

@@ -3,21 +3,22 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { useForm } from "react-hook-form";
+import PropTypes from "prop-types";
 
 export default function AddChargesDialog({ open, onOpenChange, onAddProduct }) {
   const {
@@ -25,7 +26,7 @@ export default function AddChargesDialog({ open, onOpenChange, onAddProduct }) {
     handleSubmit,
     reset,
     setValue,
-    formState: { errors },
+    formState: {},
   } = useForm();
 
   const onSubmit = (data) => {
@@ -39,6 +40,9 @@ export default function AddChargesDialog({ open, onOpenChange, onAddProduct }) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
+          <DialogDescription>
+            Add freight and cutting charges for the product.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-2 py-1">
           <div className="grid gap-2">
@@ -62,26 +66,23 @@ export default function AddChargesDialog({ open, onOpenChange, onAddProduct }) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="cutting">Payment Status</Label>
-            <Select>
+            <Label htmlFor="paymentStatus">Payment Status</Label>
+            <Select
+              onValueChange={(value) => {
+                setValue("paymentStatus", value);
+              }}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Payment Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="advance">Advance</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="on site">On Site</SelectItem>
+                  <SelectItem value="Advance">Advance</SelectItem>
+                  <SelectItem value="Cash">Cash</SelectItem>
+                  <SelectItem value="On Site">On Site</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
-
-            {/* <Input
-              id="cutting"
-              type="number"
-
-              {...register("payemnt status", { required: true, min: 0 })}
-            /> */}
           </div>
 
           <div className="flex justify-end gap-4 mt-4">
@@ -99,3 +100,9 @@ export default function AddChargesDialog({ open, onOpenChange, onAddProduct }) {
     </Dialog>
   );
 }
+
+AddChargesDialog.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onOpenChange: PropTypes.func.isRequired,
+  onAddProduct: PropTypes.func.isRequired,
+};

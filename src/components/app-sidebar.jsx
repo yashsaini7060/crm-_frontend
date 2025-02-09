@@ -14,7 +14,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
 
@@ -56,22 +55,22 @@ const data = {
     },
     {
       name: "Add New Client",
-      url: "/add-new-client",
+      url: "./add-new-client",
       icon: UserPlus,
     },
     {
       name: "Reports",
-      url: "/reports",
+      url: "./reports",
       icon: File,
     },
     {
       name: "Users",
-      url: "/users-table",
+      url: "./users-table",
       icon: User,
     },
     {
       name: "Logout",
-      url: "/logout",
+      url: "./logout",
       icon: LogOut,
     },
   ],

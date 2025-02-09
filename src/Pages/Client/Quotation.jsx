@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate, useParams } from "react-router";
+import { toast } from "react-hot-toast";
+import { getClientDetails } from "@/redux/slices/clientSlice";
+import { useForm } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,20 +24,19 @@ import {
   Plus,
   X,
   ClipboardList,
+  Loader2,
 } from "lucide-react";
 import AddProductDialog from "./AddProductDialog";
 import AddChargesDialog from "./AddChargesDialog";
 import HomeLayout from "@/Layout/HomeLayout";
-let quotationData = {
-  clientAddress: "123 Business District, Corporate Tower 4th Floor, Suite 405",
-  deliveryAddress: "456 Industrial Zone, Warehouse Complex B, Dock 7",
-  clientName: "TechCorp Solutions Ltd.",
-  clientMobile: "+1 (555) 123-4567",
-  salesPerson: "Sarah Johnson",
-  orderNo: "QT-2024-001",
-};
 
 export default function Quotation() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm();
+  const [isError, setIsError] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isChargesDialogOpen, setIsChargesDialogOpen] = useState(false);
 
@@ -41,12 +45,31 @@ export default function Quotation() {
     freight: 0,
     cutting: 0,
   });
+
+  // Generate order number once when component mounts
+  const generateOrderNo = () =>
+    `QT-${new Date().getFullYear()}-${String(
+      Math.floor(Math.random() * 1000)
+    ).padStart(3, "0")}`;
+
+  const [clientData, setClientData] = useState({
+    clientAddress: "",
+    deliveryAddress: "",
+    clientName: "",
+    clientMobile: "",
+    salesPerson: "",
+    orderNo: generateOrderNo(),
+    companyName: "",
+  });
+
   const handleAddProduct = (data) => {
     setProducts([...products, { ...data, unitType: "Box" }]);
   };
 
   const handelCharges = (data) => {
+    console.log(data);
     setCharges({
+      payment: data.paymentStatus || "Cash",
       freight: parseInt(data.freight),
       cutting: parseInt(data.cutting),
     });
@@ -64,6 +87,56 @@ export default function Quotation() {
     { text: "Dashboard", href: "/dashboard" },
     { text: "Quotation" },
   ];
+
+  useEffect(() => {
+    const fetchLeadData = async () => {
+      if (!id) return;
+
+      try {
+        setIsLoading(true);
+        const response = await dispatch(getClientDetails(id)).unwrap();
+        console.log(response);
+
+        if (response) {
+          setClientData((prevData) => ({
+            ...prevData, // Keep existing data including orderNo
+            clientAddress: response.shippingAddress || "",
+            deliveryAddress: response.deliveryAddress || "",
+            clientName: response.name || "",
+            clientMobile: response.mobile || "",
+            salesPerson: response.salesPerson?.name || "",
+            companyName: response.companyName || "",
+          }));
+
+          form.reset({
+            clientName: response.name,
+            currentSalesPerson: response.salesPerson?._id || "",
+            newSalesPerson: "",
+            reason: "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching lead:", error);
+        toast.error("Failed to fetch client details");
+        navigate("/dashboard");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLeadData();
+  }, [id, dispatch, form, navigate]);
+
+  if (isLoading) {
+    return (
+      <HomeLayout breadcrumbs={breadcrumbs}>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </HomeLayout>
+    );
+  }
+
   return (
     <HomeLayout breadcrumbs={breadcrumbs}>
       <div className="min-h-screen bg-gray-50/50">
@@ -89,7 +162,7 @@ export default function Quotation() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {quotationData.clientAddress}
+                    {clientData.clientAddress}
                   </p>
                 </CardContent>
               </Card>
@@ -103,7 +176,7 @@ export default function Quotation() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {quotationData.deliveryAddress}
+                    {clientData.deliveryAddress}
                   </p>
                 </CardContent>
               </Card>
@@ -114,20 +187,20 @@ export default function Quotation() {
                 <div className="flex items-center gap-2 text-sm">
                   <ClipboardList className="h-4 w-4 text-primary" />
                   <span className="font-medium">Order No:</span>
-                  <Badge variant="outline">{quotationData.orderNo}</Badge>
+                  <Badge variant="outline">{clientData.orderNo}</Badge>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Building2 className="h-4 w-4 text-primary" />
                   <span className="font-medium">Client Name:</span>
                   <span className="text-muted-foreground">
-                    {quotationData.clientName}
+                    {clientData.clientName} - {clientData.companyName}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="h-4 w-4 text-primary" />
                   <span className="font-medium">Client Mobile:</span>
                   <span className="text-muted-foreground">
-                    {quotationData.clientMobile}
+                    {clientData.clientMobile}
                   </span>
                 </div>
               </div>
@@ -136,7 +209,7 @@ export default function Quotation() {
                   <User className="h-4 w-4 text-primary" />
                   <span className="font-medium">Sales Person:</span>
                   <span className="text-muted-foreground">
-                    {quotationData.salesPerson}
+                    {clientData.salesPerson}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
@@ -151,7 +224,7 @@ export default function Quotation() {
                   <ClipboardList className="h-4 w-4 text-primary" />
                   <span className="font-medium">Payment Status:</span>
                   <span className="text-muted-foreground">
-                    Advance Payment
+                    {charges.payment}
                   </span>
                 </div>
               </div>
@@ -181,7 +254,6 @@ export default function Quotation() {
                     <Plus className="h-4 w-4 mr-2" />
                     Add Product
                   </Button>
-
                 </div>
               </div>
 
