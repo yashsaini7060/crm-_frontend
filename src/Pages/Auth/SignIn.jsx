@@ -51,20 +51,24 @@ function SignIn() {
     try {
       const response = await dispatch(login(signInData));
       if (response?.payload?.data) {
-        // Ensure token is properly stored in localStorage
-        console.log(response);
-        const token =
-          response.payload.data.token || response.payload.data.accessToken;
+        const { isActive, token, message } = response.payload.data;
+
+        // Store token in localStorage
         if (token) {
           localStorage.setItem("token", token);
-          console.log(token);
-          // You might also want to store other user data
-          // localStorage.setItem(
-          //   "user",
-          //   JSON.stringify(response.payload.data.user)
-          // );
         }
 
+        // Show message if account is not active
+        if (!isActive) {
+          toast.error(
+            message ||
+              "Account not verified. Please contact admin for account verification."
+          );
+          navigate("/unauthorised");
+          return;
+        }
+
+        // If account is active, proceed to dashboard
         navigate("/dashboard");
         setSignInData({
           email: "",

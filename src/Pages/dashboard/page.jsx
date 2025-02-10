@@ -55,6 +55,17 @@ import { getAllClients, deleteClient } from "@/redux/slices/clientSlice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "react-hot-toast";
 import PropTypes from "prop-types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const DataRemarks = [
   {
@@ -365,18 +376,16 @@ export default function Dashboard() {
   }, [dispatch]);
 
   const handleDeleteClient = async (clientId) => {
-    if (window.confirm("Are you sure you want to delete this client?")) {
-      try {
-        await dispatch(deleteClient(clientId)).unwrap();
-        // Update the client list by filtering out the deleted client
-        setClientList((prevList) =>
-          prevList.filter((client) => client._id !== clientId)
-        );
-        toast.success("Client deleted successfully");
-      } catch (error) {
-        toast.error("Failed to delete the client", error);
-        // You might want to show an error message to the user here
-      }
+    try {
+      await dispatch(deleteClient(clientId)).unwrap();
+      // Update the client list by filtering out the deleted client
+      setClientList((prevList) =>
+        prevList.filter((client) => client._id !== clientId)
+      );
+      toast.success("Client deleted successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete the client");
     }
   };
   // Get unique sales persons for filter
@@ -896,7 +905,7 @@ export default function Dashboard() {
                 )}
 
                 {/* Table Section */}
-                <div className="mx-2 sm:mx-4">
+                <div className="">
                   <div className="overflow-x-auto border rounded-md mt-4">
                     <Table className="w-full min-w-[800px]">
                       <TableHeader>
@@ -1017,18 +1026,42 @@ export default function Dashboard() {
                                     Quotations
                                   </DropdownMenuItem>
 
-                                  {(role === "superadmin" ||
-                                    role === "admin") && (
-                                    <DropdownMenuItem
-                                      className="text-red-600"
-                                      onClick={() =>
-                                        handleDeleteClient(item._id)
-                                      }
-                                    >
-                                      <Trash className="h-4 w-4 mr-2" />
-                                      Delete
-                                    </DropdownMenuItem>
-                                  )}
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem
+                                        className="text-red-600"
+                                        onSelect={(e) => e.preventDefault()}
+                                      >
+                                        <Trash className="h-4 w-4 mr-2" />
+                                        Delete
+                                      </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                          Are you absolutely sure?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          This action cannot be undone. This
+                                          will permanently delete the client and
+                                          remove their data from our servers.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                          Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                          className="bg-red-600 hover:bg-red-700"
+                                          onClick={() =>
+                                            handleDeleteClient(item._id)
+                                          }
+                                        >
+                                          Delete
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>

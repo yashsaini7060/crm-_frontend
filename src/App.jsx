@@ -14,6 +14,7 @@ import Quotation from "./Pages/Client/Quotation";
 import Logout from "./Pages/Auth/Logout";
 import UsersTable from "./Pages/Admin/UsersTable";
 import UpdateUser from "./Pages/Admin/UpdateUser";
+import Unauthorised from "./Pages/Auth/Unauthorised";
 function App() {
   return (
     <>
@@ -21,7 +22,7 @@ function App() {
         <Route path="/" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/logout" element={<Logout />} />
-
+        <Route path="/unauthorised" element={<Unauthorised />} />
         <Route
           element={
             <RequireAuth allowedRoles={["admin", "user", "superadmin"]} />

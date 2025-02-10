@@ -212,30 +212,33 @@ export default function UpdateStatus() {
                           className="grid grid-cols-2 gap-4"
                         >
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="initial" id="initial" />
+                            <RadioGroupItem
+                              value="Initial Contact"
+                              id="initial"
+                            />
                             <label htmlFor="initial">Initial Contact</label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="proposal" id="proposal" />
+                            <RadioGroupItem value="Proposal" id="proposal" />
                             <label htmlFor="proposal">Proposal</label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem
-                              value="negotiation"
+                              value="Negotiation"
                               id="negotiation"
                             />
                             <label htmlFor="negotiation">Negotiation</label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem
-                              value="closed-won"
+                              value="Closed Won"
                               id="closed-won"
                             />
                             <label htmlFor="closed-won">Closed Won</label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem
-                              value="closed-lost"
+                              value="Closed Lost"
                               id="closed-lost"
                             />
                             <label htmlFor="closed-lost">Closed Lost</label>

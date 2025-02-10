@@ -342,7 +342,17 @@ export default function ViewDetails() {
                       Last Contact
                     </p>
                     <p className="text-lg">
-                      {editedDetails?.lastContact || "N/A"}
+                      {editedDetails?.lastContact
+                        ? new Date(
+                            editedDetails.nextFollowUpDate
+                          ).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "N/A"}
                     </p>
                   </div>
                 </div>
