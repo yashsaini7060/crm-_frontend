@@ -247,6 +247,13 @@ export default function LeadTransfer() {
                 />
 
                 <div className="flex flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-6">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Cancel
+                  </Button>
                   <Button type="submit" className="w-full sm:w-auto">
                     Transfer Lead
                   </Button>

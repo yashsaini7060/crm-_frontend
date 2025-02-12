@@ -10,11 +10,12 @@ import UpdateStatus from "./Pages/Client/UpdateStatus";
 import BulkClientUpload from "./Pages/Client/BulkClientUpload";
 import LeadTransfer from "./Pages/Client/LeadTransfer";
 import Reports from "./Pages/Reports/page";
-import Quotation from "./Pages/Client/Quotation";
+import Quotation from "./Pages/Quotation/Quotation";
 import Logout from "./Pages/Auth/Logout";
 import UsersTable from "./Pages/Admin/UsersTable";
 import UpdateUser from "./Pages/Admin/UpdateUser";
 import Unauthorised from "./Pages/Auth/Unauthorised";
+import QuotationsTable from "./Pages/Quotation/QuotationsTable";
 function App() {
   return (
     <>
@@ -35,6 +36,8 @@ function App() {
           <Route path="/client/view/:id" element={<ViewDetails />} />
           <Route path="/client/update-status/:id" element={<UpdateStatus />} />
           <Route path="/quotation/:id" element={<Quotation />} />
+          <Route path="/quotations" element={<QuotationsTable />} />
+
           <Route path="/reports" element={<Reports />} />
           <Route path="/users-table" element={<UsersTable />} />
           <Route path="/update-user/:id" element={<UpdateUser />} />

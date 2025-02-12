@@ -113,12 +113,14 @@ function UpdateUser() {
           <div className="container mx-auto py-6 max-w-3xl">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold">User Permissions</h1>
-              <Link href="/admin/dashboard">
-                <Button variant="outline" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Dashboard
-                </Button>
-              </Link>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => navigate("/dashboard")}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Dashboard
+              </Button>
             </div>
 
             <div className="mb-4">
@@ -188,8 +190,16 @@ function UpdateUser() {
               </div>
 
               <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mr-6"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Cancel
+                </Button>
                 <Button type="submit" className="gap-2">
-                  <Check className="h-4 w-4" /> Save Changes
+                  <Check className=" h-4 w-4" /> Save Changes
                 </Button>
               </div>
             </form>

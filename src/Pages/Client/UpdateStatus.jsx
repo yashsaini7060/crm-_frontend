@@ -459,7 +459,14 @@ export default function UpdateStatus() {
                 </TabsContent>
               </Tabs>
 
-              <div className="flex justify-end">
+              <div className="flex justify-end space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Cancel
+                </Button>
                 <Button type="submit">
                   Update Status & Schedule Follow Up
                 </Button>

@@ -29,6 +29,7 @@ import {
 import AddProductDialog from "./AddProductDialog";
 import AddChargesDialog from "./AddChargesDialog";
 import HomeLayout from "@/Layout/HomeLayout";
+import { createQuotation } from "@/redux/slices/quotationSlice";
 
 export default function Quotation() {
   const dispatch = useDispatch();
@@ -88,6 +89,13 @@ export default function Quotation() {
     { text: "Quotation" },
   ];
 
+  const handleAddressChange = (type, value) => {
+    setClientData((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+  };
+
   useEffect(() => {
     const fetchLeadData = async () => {
       if (!id) return;
@@ -127,6 +135,54 @@ export default function Quotation() {
     fetchLeadData();
   }, [id, dispatch, form, navigate]);
 
+  const handleSubmitQuotation = async () => {
+    try {
+      setIsLoading(true);
+
+      const formattedProducts = products.map((product, index) => ({
+        sno: index + 1,
+        productName: product.productName,
+        size: product.size,
+        hsnNo: product.hsnNo,
+        gstPercentage: product.gst,
+        quantity: parseInt(product.qty),
+        price: parseFloat(product.price),
+        total: product.qty * product.price,
+      }));
+
+      const totalAmount =
+        products.reduce(
+          (total, product) =>
+            total +
+            (product.qty * product.price * product.gst) / 100 +
+            product.qty * product.price,
+          0
+        ) +
+        charges.freight +
+        charges.freight * (maxGst / 100) +
+        charges.cutting +
+        charges.cutting * (maxGst / 100);
+
+      const quotationData = {
+        client: id, // client ID from params
+        products: formattedProducts,
+        cuttingCharges: charges.cutting,
+        freightCharges: charges.freight,
+        totalAmount,
+        status: "Draft",
+      };
+
+      await dispatch(createQuotation(quotationData)).unwrap();
+      toast.success("Quotation created successfully!");
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error(error.message || "Failed to create quotation");
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <HomeLayout breadcrumbs={breadcrumbs}>
@@ -161,9 +217,14 @@ export default function Quotation() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {clientData.clientAddress}
-                  </p>
+                  <textarea
+                    value={clientData.clientAddress}
+                    onChange={(e) =>
+                      handleAddressChange("clientAddress", e.target.value)
+                    }
+                    className="w-full min-h-[100px] p-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Enter client address..."
+                  />
                 </CardContent>
               </Card>
 
@@ -175,9 +236,14 @@ export default function Quotation() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {clientData.deliveryAddress}
-                  </p>
+                  <textarea
+                    value={clientData.deliveryAddress}
+                    onChange={(e) =>
+                      handleAddressChange("deliveryAddress", e.target.value)
+                    }
+                    className="w-full min-h-[100px] p-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Enter delivery address..."
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -388,8 +454,19 @@ export default function Quotation() {
             </div>
 
             <div className="flex justify-end gap-4">
-              <Button variant="outline">Cancel</Button>
-              <Button>Submit Quotation</Button>
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmitQuotation} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Quotation"
+                )}
+              </Button>
             </div>
           </div>
         </div>

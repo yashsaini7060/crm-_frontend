@@ -5,6 +5,7 @@ import {
   UserPlus,
   File,
   User,
+  BookOpenText,
 } from "lucide-react";
 
 // import { NavMain } from "@/components/nav-main";
@@ -67,6 +68,11 @@ const data = {
       name: "Users",
       url: "./users-table",
       icon: User,
+    },
+    {
+      name: "Quotations",
+      url: "./quotations",
+      icon: BookOpenText,
     },
     {
       name: "Logout",
